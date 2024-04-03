@@ -17,6 +17,18 @@ app.post("/hdfcWebhook", async (req, res) => {
         amount: req.body.amount
     };
 
+
+    //Making sure that only the processing transaction gets increased :
+
+    const onRamp = await db.onRampTransaction.findMany({
+        where : {
+            token: paymentInformation.token
+        }
+    })
+    if(onRamp[0]?.status =='Success'){
+        return res.status(411).json({message : "Already made this transaction"});
+    }
+
     try {
         await db.$transaction([
             db.balance.updateMany({
