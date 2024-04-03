@@ -3,6 +3,7 @@ import { SendCard } from "../../../components/SendCard";
 import { authOptions } from "../../lib/auth";
 import prisma from '@repo/db/client'
 import { BalanceCard } from "../../../components/BalanceCard";
+import { P2pTransactions } from "../../../components/P2pTransactions";
 
 async function getBalance() {
     const session = await getServerSession(authOptions);
@@ -17,9 +18,24 @@ async function getBalance() {
     }
 }
 
+async function getP2pTransations(){
+    const session = await getServerSession(authOptions);
+    const p2pTxns = await prisma.p2pTransfer.findMany({
+        where : {
+            fromUserId : Number(session?.user?.id)
+        }
+    })
+    return p2pTxns.map(t=>({
+        fromUserId : t.fromUserId,
+        toUserId : t.toUserId,
+        amount : t.amount,
+        timestamp : t.timestamp
+    }))
+}
+
 export default async function (){
     const balance = await getBalance();
-
+    const p2pTxns = await getP2pTransations();
     return <div className="w-screen">
     <div className="text-4xl text-[#6a51a6] pt-8 mb-8 font-bold">
         P2P Transfer
@@ -30,9 +46,9 @@ export default async function (){
         </div>
         <div>
             <BalanceCard amount={balance.amount} locked={balance.locked} />
-            {/* <div className="pt-4">
-                <OnRampTransactions transactions={transactions} />
-            </div> */}
+            <div className="pt-4">
+                <P2pTransactions p2ptransactions={p2pTxns} />
+            </div>
         </div>
     </div>
 </div>

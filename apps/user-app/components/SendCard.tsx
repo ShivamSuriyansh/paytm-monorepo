@@ -13,7 +13,7 @@ export function SendCard() {
     return <div className="w-full">
         <Center>
             <Card title="Send">
-                <div className=" min-w-96 pt-2">
+                <div className=" min-w-72 pt-2 p-2 mr-2">
                     <TextInput placeholder={"Number"} label="Number" onChange={(value) => {
                         setNumber(value)
                     }} />
